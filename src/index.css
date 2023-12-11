@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .rounded-full {
+    border-radius: 50%;
+    transition: border-radius 0.3s ease-in-out;
+  }
+
+  .group:hover .rounded-full {
+    border-radius: 50% !important;
+  }
+  
+
+  .border-gradient {
+    border-image: linear-gradient(to bottom right, hsl(192, 100%, 67%), hsl(280, 87%, 65%)) 1;
+    border-image-slice: 1;
+    border-width: 1px;
+    border-style: solid;
+  }
+}
