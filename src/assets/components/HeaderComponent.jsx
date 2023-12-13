@@ -24,14 +24,14 @@ const HeaderComponent = ({ darkMode, setDarkMode, newTodo, setNewTodo, addTodo }
                 {/* Add new todo */}
 
                 <div
-                    className={`addtodos flex justify-start ${darkMode
+                    className={`addtodos flex justify-start  ${darkMode
                         ? 'bg-DVeryDarkDesaturatedBlue'
                         : 'bg-VeryLightGray'
                         } w-11/12 h-12 rounded-md mx-auto p-3`}
                 >
-                    <div className={darkMode ? 'rounded-full border border-gray-700 ml-1 w-6 h-6 ' : 'rounded-full border border-gray-300 ml-1 w-6 h-6'}></div>
+                    <div className={darkMode ? 'absolute rounded-full border border-gray-700 ml-1 w-6 h-6 ' : 'absolute rounded-full border border-gray-300 ml-1 w-6 h-6'}></div>
                     <input
-                        className={darkMode ? 'w-full bg-inherit px-4 placeholder-gray-500 outline-none text-gray-200 pointer' : 'w-full bg-inherit px-4 placeholder-gray-400 outline-none text-gray-700 pointer'}
+                        className={darkMode ? 'w-full bg-inherit px-10 placeholder-gray-500 outline-none text-gray-200 pointer' : 'w-full bg-inherit px-10 placeholder-gray-400 outline-none text-gray-700 pointer'}
                         placeholder='Create a new todo...'
                         value={newTodo}
                         onChange={(e) => setNewTodo(e.target.value)}
