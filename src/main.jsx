@@ -1,13 +1,13 @@
+// main.jsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
-import { TodoProvider } from './assets/components/TodoContext.jsx';
+import useTodoStore from './assets/components/TodoContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  
-    <TodoProvider>
-      <App  />
-    </TodoProvider>
+  <React.StrictMode>
+    <App useTodoStore={useTodoStore} />
+  </React.StrictMode>,
   
 )

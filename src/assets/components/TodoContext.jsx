@@ -1,107 +1,109 @@
 // TodoContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { create } from 'zustand';
 
-const TodoContext = createContext();
+const useTodoStore = create((set) => ({
+  todos: [],
+  newTodo: '',
+  currentFilter: 'all',
+  darkMode: false,
+  remainingItems: 0,
+  selectedFilter: 'all',
 
-const LOCAL_STORAGE_KEYS = {
-  TODOS: 'todos',
-  CURRENT_FILTER: 'currentFilter',
-  DARK_MODE: 'darkMode',
-};
+  addTodo: () => {
+    set((state) => {
+      const newTodo = { text: state.newTodo, completed: false, id: Date.now() };
+      const updatedTodos = [...state.todos, newTodo];
 
-export const TodoProvider = ({ children }) => {
-  // State variables
-  const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState('');
-  const [currentFilter, setCurrentFilter] = useState('all');
-  const [darkMode, setDarkMode] = useState(false);
-  const [remainingItems, setRemainingItems] = useState(0);
-  const [selectedFilter, setSelectedFilter] = useState('all');
+      // Update local storage
+      localStorage.setItem('todos', JSON.stringify(updatedTodos));
 
-  // Load data from local storage on component mount
-  useEffect(() => {
-    const storedTodos = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.TODOS)) || [];
-    const storedFilter = localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_FILTER) || 'all';
-    const storedDarkMode = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.DARK_MODE)) || false;
+      return {
+        todos: updatedTodos,
+        newTodo: '',
+        remainingItems: state.remainingItems + 1,
+      };
+    });
+  },
 
-    setTodos(storedTodos);
-    setCurrentFilter(storedFilter);
-    setSelectedFilter(storedFilter);
-    setRemainingItems(storedTodos.filter((todo) => !todo.completed).length);
-    setDarkMode(storedDarkMode);
-  }, []);
+  toggleComplete: (id) => {
+    set((state) => {
+      const updatedTodos = state.todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      );
 
-  // Update local storage whenever todos, current filter, or dark mode changes
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEYS.TODOS, JSON.stringify(todos));
-    localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_FILTER, currentFilter);
-    localStorage.setItem(LOCAL_STORAGE_KEYS.DARK_MODE, JSON.stringify(darkMode));
-  }, [todos, currentFilter, darkMode]);
+      // Update local storage
+      localStorage.setItem('todos', JSON.stringify(updatedTodos));
 
-  // Add a new todo to the list
-  const addTodo = () => {
-    if (newTodo.trim() !== '') {
-      const updatedTodos = [...todos, { text: newTodo, completed: false, id: Date.now() }];
-      updateTodos(updatedTodos);
-      setNewTodo('');
-    }
-  };
+      return {
+        todos: updatedTodos,
+        remainingItems:
+          state.remainingItems + (state.todos.find((t) => t.id === id)?.completed ? 1 : -1),
+      };
+    });
+  },
 
-  // Toggle the completion status of a todo
-  const toggleComplete = (id) => {
-    const updatedTodos = todos.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo));
-    updateTodos(updatedTodos);
-  };
+  deleteTodo: (id) => {
+    set((state) => {
+      const updatedTodos = state.todos.filter((todo) => todo.id !== id);
 
-  // Delete a todo from the list
-  const deleteTodo = (id) => {
-    const updatedTodos = todos.filter((todo) => todo.id !== id);
-    updateTodos(updatedTodos);
-  };
+      // Update local storage
+      localStorage.setItem('todos', JSON.stringify(updatedTodos));
 
-  // Clear completed todos from the list
-  const clearCompleted = () => {
-    const updatedTodos = todos.filter((todo) => !todo.completed);
-    updateTodos(updatedTodos);
-  };
+      return {
+        todos: updatedTodos,
+        remainingItems: state.remainingItems - (state.todos.find((t) => t.id === id)?.completed ? 0 : 1),
+      };
+    });
+  },
 
-  // Set the current filter for displaying todos
-  const filterTodos = (status) => {
-    setCurrentFilter(status);
-    setSelectedFilter(status);
-  };
+  clearCompleted: () => {
+    set((state) => {
+      const updatedTodos = state.todos.filter((todo) => !todo.completed);
 
-  // Update todos and remaining items count
-  const updateTodos = (updatedTodos) => {
-    setTodos(updatedTodos);
-    setRemainingItems(updatedTodos.filter((todo) => !todo.completed).length);
-  };
+      // Update local storage
+      localStorage.setItem('todos', JSON.stringify(updatedTodos));
 
-  // Provider value includes state variables and functions
-  return (
-    <TodoContext.Provider
-      value={{
-        todos,
-        newTodo,
-        currentFilter,
-        darkMode,
-        remainingItems,
-        selectedFilter,
-        addTodo,
-        toggleComplete,
-        deleteTodo,
-        clearCompleted,
-        filterTodos,
-        setDarkMode,
-        setNewTodo,
-      }}
-    >
-      {children}
-    </TodoContext.Provider>
-  );
-};
+      return {
+        todos: updatedTodos,
+        remainingItems: updatedTodos.filter((todo) => !todo.completed).length,
+      };
+    });
+  },
 
-// Custom hook for accessing the TodoContext
-export const useTodoContext = () => {
-  return useContext(TodoContext);
-};
+  filterTodos: (status) => {
+    set((state) => ({
+      currentFilter: status,
+      selectedFilter: status,
+    }));
+  },
+
+  setTodos: (todos) => {
+    set((state) => ({
+      ...state,
+      todos,
+      remainingItems: todos.filter((todo) => !todo.completed).length,
+    }));
+  },
+
+  setNewTodo: (newTodo) => set((state) => ({ ...state, newTodo })),
+  setCurrentFilter: (currentFilter) => set((state) => ({ ...state, currentFilter })),
+  setDarkMode: (darkMode) => set((state) => ({ ...state, darkMode })),
+  setRemainingItems: (remainingItems) => set((state) => ({ ...state, remainingItems })),
+  setSelectedFilter: (selectedFilter) => set((state) => ({ ...state, selectedFilter })),
+}));
+
+// Load data from local storage on component mount
+const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+const storedFilter = localStorage.getItem('currentFilter') || 'all';
+const storedDarkMode = JSON.parse(localStorage.getItem('darkMode'));
+
+// Initialize the store with the stored data or defaults
+useTodoStore.setState({
+  todos: storedTodos,
+  currentFilter: storedFilter,
+  selectedFilter: storedFilter,
+  remainingItems: storedTodos.filter((todo) => !todo.completed).length,
+  darkMode: storedDarkMode !== null ? storedDarkMode : false,
+});
+
+export default useTodoStore;

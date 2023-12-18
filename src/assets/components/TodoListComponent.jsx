@@ -15,18 +15,20 @@ const TodoListComponent = ({ todos, toggleComplete, deleteTodo, clearCompleted, 
             } w-full h-12 p-3 border-b ${index === 0 ? 'rounded-t-md' : ''} ${todo.completed ? '' : ''}`}>
 
             {/* Circular button to toggle completion status */}
+           
             <div
               style={{
                 background: todo.completed
                   ? 'linear-gradient(to bottom right, hsl(192, 100%, 67%), hsl(280, 87%, 65%))'
                   : 'transparent',
               }}
-              className={`group rounded-full absolute p-[6px] border ${darkMode
+              className={`parent rounded-full absolute p-[6px] border ${darkMode
                 ? 'border-gray-700'
                 : 'border-gray-300'
-              } mx-1 w-6 h-6 pointer transition-all duration-300 hover:border-gradient hover:rounded-full hover:cursor-pointer`}
+              } mx-1 w-6 h-6 transition-all hover:cursor-pointer`}
               onClick={() => toggleComplete(todo.id)}
             >
+              
               {/* Checkmark icon when todo is completed */}
               {todo.completed && (
                 <svg
@@ -42,8 +44,11 @@ const TodoListComponent = ({ todos, toggleComplete, deleteTodo, clearCompleted, 
                     d="M1 4.304L3.696 7l6-6"
                   />
                 </svg>
+               
               )}
             </div>
+
+
 
             {/* Todo text */}
             <p className={`pointer text-left ml-9 px-2 w-56 truncate ${darkMode

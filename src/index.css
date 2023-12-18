@@ -1,22 +1,29 @@
+/* index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer utilities {
-  .rounded-full {
+ 
+
+  .parent::before {
+    content: "";
+    position: absolute;
+    inset: 0;
     border-radius: 50%;
-    transition: border-radius 0.3s ease-in-out;
+    padding: 1px;
+    /* control the border thickness */
+    
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
-
-  .group:hover .rounded-full {
-    border-radius: 50% !important;
-  }
-  
-
-  .border-gradient {
-    border-image: linear-gradient(to bottom right, hsl(192, 100%, 67%), hsl(280, 87%, 65%)) 1;
-    border-image-slice: 1;
-    border-width: 1px;
-    border-style: solid;
-  }
+  .parent:hover::before {
+    background: linear-gradient(to bottom right, hsl(192, 100%, 67%), hsl(280, 87%, 65%)); /* Change the gradient on hover */
 }
+}
+
+/* linear-gradient(to bottom right, hsl(192, 100%, 67%), hsl(280, 87%, 65%)) */
